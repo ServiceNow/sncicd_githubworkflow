@@ -1,8 +1,17 @@
-## Starter Workflows for ServiceNow CI/CD
+## Starter Workflows for ServiceNow CI/CD using GitHub Actions
 
 These are the workflow files for helping people get started with GitHub Actions when building applications on the Now Platform.
 
 Just copy and paste into your pipeline once your workflow is created for your application's linked GitHub repo. 
+
+## Repos
+- https://github.com/ServiceNow/sncicd-apply-changes
+- https://github.com/ServiceNow/sncicd-install-app
+- https://github.com/ServiceNow/sncicd-publish-app
+- https://github.com/ServiceNow/sncicd-rollback-app
+- https://github.com/ServiceNow/sncicd-tests-run
+- https://github.com/ServiceNow/sncicd-plugin-activate
+- https://github.com/ServiceNow/sncicd-plugin-rollback
 
 ## Support Model
 
