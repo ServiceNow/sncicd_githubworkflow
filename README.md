@@ -1,4 +1,4 @@
-## Starter Workflows for ServiceNow CI/CD using GitHub Actions
+# Starter Workflows for ServiceNow CI/CD using GitHub Actions
 
 These are the workflow files for helping people get started with GitHub Actions when building applications on the Now Platform.
 
