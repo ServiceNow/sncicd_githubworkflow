@@ -1,0 +1,114 @@
+# Workflow still under development, to be validated after all GitHub Actions published. 
+
+name: ServiceNow
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    name: BUILD
+    runs-on: ubuntu-latest
+    steps:
+      - name: Apply Changes
+        uses: ServiceNow/sncicd-apply-changes
+        env:
+          snowUsername: ${{ secrets.SNOW_USERNAME }}
+          snowPassword: ${{ secrets.SNOW_PASSWORD }}
+          snowSourceInstance: ${{ secrets.SNOW_SOURCE_INSTANCE }} # your dev instance
+          appSysID: ${{ secrets.APP_SYS_ID }}
+          appScope: ${{ secrets.APP_SCOPE }}
+
+      - name: Publish Application
+        id: sncicd-publish-app
+        uses: ServiceNow/sncicd-publish-app
+        with:
+          version: "x.x.x"
+          versionTemplate: "x.x"
+          devNotes: "string"
+          versionFormat: exact
+        env:
+          snowUsername: ${{ secrets.SNOW_USERNAME }}
+          snowPassword: ${{ secrets.SNOW_PASSWORD }}
+          snowSourceInstance: ${{ secrets.SNOW_SOURCE_INSTANCE }} # your dev instance
+          appSysID: ${{ secrets.APP_SYS_ID }}
+          appScope: ${{ secrets.APP_SCOPE }}
+
+jobs:
+  build:
+    name: TEST
+    runs-on: ubuntu-latest
+#      - name: Activate Plugin
+#        id: sncicd-plugin-activate
+#        uses: ServiceNow/sncicd-plugin-activate
+#        with:
+#          pluginID:
+#        env:
+#          snowUsername: ${{ secrets.SNOW_USERNAME }}
+#          snowPassword: ${{ secrets.SNOW_PASSWORD }}
+#          snowInstallInstance: ${{ secrets.SNOW_INSTALL_INSTANCE }} # your test instance
+      
+      - name: Install Application
+        id: sncicd-install-app
+        uses: ServiceNow/sncicd-install-app
+        with:
+          version: ${{steps.publish_app.outputs.newVersion}}
+        env:
+          snowUsername: ${{ secrets.SNOW_USERNAME }}
+          snowPassword: ${{ secrets.SNOW_PASSWORD }}
+          snowInstallInstance: ${{ secrets.SNOW_INSTALL_INSTANCE }} # your test instance
+          appSysID: ${{ secrets.APP_SYS_ID }}
+          appScope: ${{ secrets.APP_SCOPE }}
+  
+      - name: Run Tests
+        uses: ServiceNow/sncicd-tests-run
+        with:
+          browserName:
+          browserVersion:
+          osName:
+          osVersion:
+          testSuiteSysId:
+          testSuiteName:
+        env:
+          snowUsername: ${{ secrets.SNOW_USERNAME }}
+          snowPassword: ${{ secrets.SNOW_PASSWORD }}
+          snowInstallInstance: ${{ secrets.SNOW_INSTALL_INSTANCE }} # your test instance
+         
+      - name: Rollback Application
+        if: ${{ failure() && steps.install_app.outputs.rollbackVersion }}
+        uses: ServiceNow/sncicd-rollback-app
+        with:
+          version: ${{steps.install_app.outputs.rollbackVersion}}
+        env:
+          snowUsername: ${{ secrets.SNOW_USERNAME }}
+          snowPassword: ${{ secrets.SNOW_PASSWORD }}
+          snowInstallInstance: ${{ secrets.SNOW_INSTALL_INSTANCE }} # your test instance
+          appSysID: ${{ secrets.APP_SYS_ID }}
+          appScope: ${{ secrets.APP_SCOPE }}
+          
+#      - name: Rollback Plugin
+#        if: ${{ failure() && steps.activate_plugin.outputs.failed }} # Runs if Activate Plugin step is failed
+#        uses: ServiceNow/sncicd-plugin-rollback
+#        with:
+#          pluginID:
+#        env:
+#         snowUsername: ${{ secrets.SNOW_USERNAME }}
+#          snowPassword: ${{ secrets.SNOW_PASSWORD }}
+#          snowInstallInstance: ${{ secrets.SNOW_INSTALL_INSTANCE }} # your test instance
+
+jobs:
+  build:
+    name: DEPLOY
+    runs-on: ubuntu-latest
+      - name: Install Application
+        id: sncicd-install-app
+        uses: ServiceNow/sncicd-install-app
+        with:
+          version: ${{steps.publish_app.outputs.newVersion}}
+        env:
+          snowUsername: ${{ secrets.SNOW_USERNAME }}
+          snowPassword: ${{ secrets.SNOW_PASSWORD }}
+          snowInstallInstance: ${{ secrets.SNOW_INSTALL_INSTANCE }} # your prod instance
+          appSysID: ${{ secrets.APP_SYS_ID }}
+          appScope: ${{ secrets.APP_SCOPE }}
