@@ -4,6 +4,16 @@ These are the workflow files for helping people get started with GitHub Actions 
 
 Just copy and paste into your pipeline once your workflow is created for your application's linked GitHub repo. 
 
+## Marketplace
+
+https://github.com/marketplace/actions/servicenow-ci-cd-apply-changes
+https://github.com/marketplace/actions/servicenow-ci-cd-install-app
+https://github.com/marketplace/actions/servicenow-ci-cd-publish-app
+https://github.com/marketplace/actions/servicenow-ci-cd-rollback-app
+https://github.com/marketplace/actions/servicenow-ci-cd-run-atf-test-suite
+https://github.com/marketplace/actions/servicenow-ci-cd-activate-plugin
+https://github.com/marketplace/actions/servicenow-ci-cd-rollback-plugin
+
 ## Repos
 - https://github.com/ServiceNow/sncicd-apply-changes
 - https://github.com/ServiceNow/sncicd-install-app
