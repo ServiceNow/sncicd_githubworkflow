@@ -1,114 +1,108 @@
-# Workflow still under development, to be validated after all GitHub Actions published. 
-
-name: ServiceNow
+name: ServiceNow GitHub Actions Demo
 
 on:
+  pull_request:
   push:
-    branches: [ master ]
+    branches:
+      - master
 
 jobs:
   build:
-    name: BUILD
+    name: Publish from Dev
     runs-on: ubuntu-latest
+    # if: ${{ github.event_name == 'pull_request'}}
+    
     steps:
-      - name: Apply Changes
-        uses: ServiceNow/sncicd-apply-changes
-        env:
-          snowUsername: ${{ secrets.SNOW_USERNAME }}
-          snowPassword: ${{ secrets.SNOW_PASSWORD }}
-          snowSourceInstance: ${{ secrets.SNOW_SOURCE_INSTANCE }} # your dev instance
-          appSysID: ${{ secrets.APP_SYS_ID }}
-          appScope: ${{ secrets.APP_SCOPE }}
 
-      - name: Publish Application
-        id: sncicd-publish-app
-        uses: ServiceNow/sncicd-publish-app
+      - name: ServiceNow CI/CD Apply Changes
+        uses: ServiceNow/sncicd-apply-changes@1.0.0
+        env:
+          snowUsername: ${{ secrets.SN_USERNAME }}
+          snowPassword: ${{ secrets.SN_PASSWORD }}
+          snowSourceInstance: ${{ secrets.SN_DEV_INSTANCE }}
+          appSysID: ${{ secrets.SN_APP_SYSID }}
+
+      - name: ServiceNow CI/CD Publish App
+        id: publish_app
+        uses: ServiceNow/sncicd-publish-app@1.0.0
         with:
-          version: "x.x.x"
-          versionTemplate: "x.x"
-          devNotes: "string"
-          versionFormat: exact
+          versionTemplate: 2.4
+          versionFormat: template
         env:
-          snowUsername: ${{ secrets.SNOW_USERNAME }}
-          snowPassword: ${{ secrets.SNOW_PASSWORD }}
-          snowSourceInstance: ${{ secrets.SNOW_SOURCE_INSTANCE }} # your dev instance
-          appSysID: ${{ secrets.APP_SYS_ID }}
-          appScope: ${{ secrets.APP_SCOPE }}
+          snowUsername: ${{ secrets.SN_USERNAME }}
+          snowPassword: ${{ secrets.SN_PASSWORD }}
+          snowSourceInstance: ${{ secrets.SN_DEV_INSTANCE }}
+          appSysID: ${{ secrets.SN_APP_SYSID }}
+       
+      - id: version
+        run: |
+          # use bash variable expression to get the substring
+          export PUBLISH_VERSION="${{ steps.publish_app.outputs.newVersion }}"
+          echo "::set-output name=publishversion::${PUBLISH_VERSION}"
+    outputs:
+      publishversion: ${{ steps.version.outputs.publishversion }}
 
-jobs:
-  build:
-    name: TEST
+  test:
+    needs: build
+    name: Run ATF in Test
     runs-on: ubuntu-latest
-#      - name: Activate Plugin
-#        id: sncicd-plugin-activate
-#        uses: ServiceNow/sncicd-plugin-activate
-#        with:
-#          pluginID:
-#        env:
-#          snowUsername: ${{ secrets.SNOW_USERNAME }}
-#          snowPassword: ${{ secrets.SNOW_PASSWORD }}
-#          snowInstallInstance: ${{ secrets.SNOW_INSTALL_INSTANCE }} # your test instance
-      
-      - name: Install Application
-        id: sncicd-install-app
-        uses: ServiceNow/sncicd-install-app
+    # if: ${{ github.event_name == 'pull_request'}}
+    
+    steps:
+
+      - name: ServiceNow CI/CD Install App
+        id: install_app
+        uses: ServiceNow/sncicd-install-app@1.0.0
         with:
-          version: ${{steps.publish_app.outputs.newVersion}}
+          version: ${{ needs.build.outputs.publishversion }}
         env:
-          snowUsername: ${{ secrets.SNOW_USERNAME }}
-          snowPassword: ${{ secrets.SNOW_PASSWORD }}
-          snowInstallInstance: ${{ secrets.SNOW_INSTALL_INSTANCE }} # your test instance
-          appSysID: ${{ secrets.APP_SYS_ID }}
-          appScope: ${{ secrets.APP_SCOPE }}
-  
-      - name: Run Tests
-        uses: ServiceNow/sncicd-tests-run
+          snowUsername: ${{ secrets.SN_USERNAME }}
+          snowPassword: ${{ secrets.SN_PASSWORD }}
+          snowInstallInstance: ${{ secrets.SN_TEST_INSTANCE }}
+          appSysID: ${{ secrets.SN_APP_SYSID }}
+
+      - name: ServiceNow CI/CD Run ATF Test Suite
+        uses: ServiceNow/sncicd-tests-run@1.0.0
         with:
-          browserName:
-          browserVersion:
-          osName:
-          osVersion:
-          testSuiteSysId:
-          testSuiteName:
+          testSuiteSysId: ${{ secrets.SN_ATFTESTSUITE_SYSID }}
         env:
-          snowUsername: ${{ secrets.SNOW_USERNAME }}
-          snowPassword: ${{ secrets.SNOW_PASSWORD }}
-          snowInstallInstance: ${{ secrets.SNOW_INSTALL_INSTANCE }} # your test instance
-         
-      - name: Rollback Application
+          snowUsername: ${{ secrets.SN_USERNAME }}
+          snowPassword: ${{ secrets.SN_PASSWORD }}
+          snowInstallInstance: ${{ secrets.SN_TEST_INSTANCE }}
+
+      - name: ServiceNow CI/CD Rollback App
         if: ${{ failure() && steps.install_app.outputs.rollbackVersion }}
-        uses: ServiceNow/sncicd-rollback-app
+        uses: ServiceNow/sncicd-rollback-app@1.0.0
         with:
           version: ${{steps.install_app.outputs.rollbackVersion}}
         env:
-          snowUsername: ${{ secrets.SNOW_USERNAME }}
-          snowPassword: ${{ secrets.SNOW_PASSWORD }}
-          snowInstallInstance: ${{ secrets.SNOW_INSTALL_INSTANCE }} # your test instance
-          appSysID: ${{ secrets.APP_SYS_ID }}
-          appScope: ${{ secrets.APP_SCOPE }}
-          
-#      - name: Rollback Plugin
-#        if: ${{ failure() && steps.activate_plugin.outputs.failed }} # Runs if Activate Plugin step is failed
-#        uses: ServiceNow/sncicd-plugin-rollback
-#        with:
-#          pluginID:
-#        env:
-#         snowUsername: ${{ secrets.SNOW_USERNAME }}
-#          snowPassword: ${{ secrets.SNOW_PASSWORD }}
-#          snowInstallInstance: ${{ secrets.SNOW_INSTALL_INSTANCE }} # your test instance
+          snowUsername: ${{ secrets.SN_USERNAME }}
+          snowPassword: ${{ secrets.SN_PASSWORD }}
+          snowInstallInstance: ${{ secrets.SN_TEST_INSTANCE }}
+          appSysID: ${{ secrets.SN_APP_SYSID }}
 
-jobs:
-  build:
-    name: DEPLOY
+      - id: version
+        run: |
+          # use bash variable expression to get the substring
+          export PUBLISH_VERSION="${{ needs.build.outputs.publishversion }}"
+          echo "::set-output name=publishversion::${PUBLISH_VERSION}"
+    outputs:
+      publishversion: ${{ steps.version.outputs.publishversion }}
+
+  deployprod:
+    needs: test
+    name: Deploy to Prod
     runs-on: ubuntu-latest
-      - name: Install Application
-        id: sncicd-install-app
-        uses: ServiceNow/sncicd-install-app
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+    steps:
+    
+      - name: ServiceNow CI/CD Install App
+        id: install_app_prod
+        uses: ServiceNow/sncicd-install-app@1.0.0
         with:
-          version: ${{steps.publish_app.outputs.newVersion}}
+          version: ${{ needs.test.outputs.publishversion }}
         env:
-          snowUsername: ${{ secrets.SNOW_USERNAME }}
-          snowPassword: ${{ secrets.SNOW_PASSWORD }}
-          snowInstallInstance: ${{ secrets.SNOW_INSTALL_INSTANCE }} # your prod instance
-          appSysID: ${{ secrets.APP_SYS_ID }}
-          appScope: ${{ secrets.APP_SCOPE }}
+          snowUsername: ${{ secrets.SN_USERNAME }}
+          snowPassword: ${{ secrets.SN_PASSWORD }}
+          snowInstallInstance: ${{ secrets.SN_PROD_INSTANCE }}
+          appSysID: ${{ secrets.SN_APP_SYSID }}
