@@ -37,18 +37,13 @@ jobs:
           snowPassword: ${{ secrets.SN_PASSWORD }}
           snowSourceInstance: ${{ secrets.SN_DEV_INSTANCE }}
           appSysID: ${{ secrets.SN_APP_SYSID }}
-       
-      - id: version
-        # This is required to pass the version number output from Publish App 
-        # to the input for Install App in the next job! This is because the jobs 
-        # run on different Linux instances, so without this Install App won't know
-        # what to install. Uses the bash variable expression to get the substring. 
-        run: |
-          export PUBLISH_VERSION="${{ steps.publish_app.outputs.newVersion }}"
-          echo "::set-output name=publishversion::${PUBLISH_VERSION}"
           
+    # This is required to pass the version number output from Publish App 
+    # to the input for Install App in the next job! This is because the jobs 
+    # run on different Linux instances, so without this Install App won't know
+    # what to install.
     outputs:
-      publishversion: ${{ steps.version.outputs.publishversion }}
+      publishversion: ${{ steps.publish_app.outputs.newVersion }}
 
   test:
     # Purpose of this job is to Install App from the app repo for the version 
@@ -94,17 +89,12 @@ jobs:
           snowInstallInstance: ${{ secrets.SN_TEST_INSTANCE }}
           appSysID: ${{ secrets.SN_APP_SYSID }}
 
-      - id: version
-        # This is required to pass the version number output from Publish App 
-        # to the input for Install App in the next job! This is because the jobs 
-        # run on different Linux instances, so without this Install App won't know
-        # what to install. Uses the bash variable expression to get the substring.
-        run: |
-          export PUBLISH_VERSION="${{ needs.build.outputs.publishversion }}"
-          echo "::set-output name=publishversion::${PUBLISH_VERSION}"
-          
+    # This is required to pass the version number output from Publish App 
+    # to the input for Install App in the next job! This is because the jobs 
+    # run on different Linux instances, so without this Install App won't know
+    # what to install.
     outputs:
-      publishversion: ${{ steps.version.outputs.publishversion }}
+      publishversion: ${{ needs.build.outputs.publishversion }}
 
   deployprod:
     # Purpose of this job is to Install App to a Prod instance. This should only 
