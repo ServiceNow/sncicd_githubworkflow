@@ -8,10 +8,14 @@ on:
 
 jobs:
   build:
+    # Purpose of this job is to Apply Remote Changes for the branch triggering 
+    # the pipeline build to the Dev instance, then publish the application to 
+    # app repo using the template versioning format. 
     name: Publish from Dev
     runs-on: ubuntu-latest
+    # Below line can be used to set conditionals for modifying your pipeline as needed.
     # if: ${{ github.event_name == 'pull_request'}}
-    
+
     steps:
 
       - name: ServiceNow CI/CD Apply Changes
@@ -26,7 +30,7 @@ jobs:
         id: publish_app
         uses: ServiceNow/sncicd-publish-app@1.0.0
         with:
-          versionTemplate: 4.0
+          versionTemplate: 1.1
           versionFormat: template
         env:
           snowUsername: ${{ secrets.SN_USERNAME }}
@@ -35,17 +39,26 @@ jobs:
           appSysID: ${{ secrets.SN_APP_SYSID }}
        
       - id: version
+        # This is required to pass the version number output from Publish App 
+        # to the input for Install App in the next job! This is because the jobs 
+        # run on different Linux instances, so without this Install App won't know
+        # what to install. Uses the bash variable expression to get the substring. 
         run: |
-          # use bash variable expression to get the substring
           export PUBLISH_VERSION="${{ steps.publish_app.outputs.newVersion }}"
           echo "::set-output name=publishversion::${PUBLISH_VERSION}"
+          
     outputs:
       publishversion: ${{ steps.version.outputs.publishversion }}
 
   test:
+    # Purpose of this job is to Install App from the app repo for the version 
+    # published in the build job to a Test instance, then run an ATF Test Suite 
+    # associated with the app. If Test Suite fails, the app should be Rolled Back 
+    # to clean up the persistent Test environment. 
     needs: build
     name: Run ATF in Test
     runs-on: ubuntu-latest
+    # Below line can be used to set conditionals for modifying your pipeline as needed.
     # if: ${{ github.event_name == 'pull_request'}}
     
     steps:
@@ -82,14 +95,22 @@ jobs:
           appSysID: ${{ secrets.SN_APP_SYSID }}
 
       - id: version
+        # This is required to pass the version number output from Publish App 
+        # to the input for Install App in the next job! This is because the jobs 
+        # run on different Linux instances, so without this Install App won't know
+        # what to install. Uses the bash variable expression to get the substring.
         run: |
-          # use bash variable expression to get the substring
           export PUBLISH_VERSION="${{ needs.build.outputs.publishversion }}"
           echo "::set-output name=publishversion::${PUBLISH_VERSION}"
+          
     outputs:
       publishversion: ${{ steps.version.outputs.publishversion }}
 
   deployprod:
+    # Purpose of this job is to Install App to a Prod instance. This should only 
+    # trigger if the feature branch has been merged to master after a successfully 
+    # completed pull request, hence the conditional for push to master. In other words,
+    # the first two jobs run on CI, then all three jobs run on CD. 
     needs: test
     name: Deploy to Prod
     runs-on: ubuntu-latest
