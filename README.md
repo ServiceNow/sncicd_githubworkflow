@@ -8,7 +8,7 @@ Just copy and paste into your pipeline once your workflow is created for your ap
 
 This extension provides Build Steps for setting up Continuous Integration (CI) or Continuous Delivery (CD) workflows using GitHub Actions and workflows for developing applications on the [Now Platform from ServiceNow](https://www.servicenow.com/now-platform.html). **Click on the below screenshot to see a video for how you can use this extension to get started faster.**
 
-[![Get Started with GitHub Actions in 10 Minutes](doc/youtube_link_GitHubActions.png)](https://www.youtube.com/watch?v=mpnYwGPvMPg "Get Started with GitHub Actions in 10 Minutes")
+[![Get Started with GitHub Actions in 10 Minutes](youtube_link_GitHubActions.png)](https://www.youtube.com/watch?v=mpnYwGPvMPg "Get Started with GitHub Actions in 10 Minutes")
 
 The Build Steps are API wrappers for the [CI/CD APIs](https://developer.servicenow.com/dev.do#!/reference/api/paris/rest/cicd-api) first released with Orlando, and do not cover other ServiceNow APIs. They will currently work with the Orlando and Paris releases. 
 
