@@ -7,7 +7,8 @@ Just copy and paste into your pipeline once your workflow is created for your ap
 ## Description of workflow templates
 - [workflow.yml](https://github.com/ServiceNow/sncicd_githubworkflow/blob/master/workflow.yml) Standard example to start from with 3 stages - build, test, deploy to prod. First two runs for CI on feature branch PR. All 3 run for CD on master branch update. 
 - [workflow_publish_with_detect.yml](https://github.com/ServiceNow/sncicd_githubworkflow/blob/master/workflow_publish_with_detect.yml) Example for how to use the "detect" option with the ServiceNow/sncicd-publish-app GitHub Action. This is necessary for the repo source to be populated into the runner environment. 
-
+- [workflow_scan_instance.yml](https://github.com/ServiceNow/sncicd_githubworkflow/blob/master/workflow_scan_instance.yml) Standard example to start working with Scan Instance action.
+- [workflow_batch_install.yml](https://github.com/ServiceNow/sncicd_githubworkflow/blob/master/workflow_scan_instance.yml) Standard example to start working with Batch Install action. [Example of payload](https://github.com/ServiceNow/sncicd_githubworkflow/blob/master/batch_payload.json).
 
 ## Marketplace
 
@@ -18,6 +19,8 @@ Just copy and paste into your pipeline once your workflow is created for your ap
 - https://github.com/marketplace/actions/servicenow-ci-cd-run-atf-test-suite
 - https://github.com/marketplace/actions/servicenow-ci-cd-activate-plugin
 - https://github.com/marketplace/actions/servicenow-ci-cd-rollback-plugin
+- <Add Batch Install Action After Publication>
+- <Add Scan Instance Action After Publication>
 
 ## Repos
 - https://github.com/ServiceNow/sncicd-apply-changes
@@ -27,6 +30,8 @@ Just copy and paste into your pipeline once your workflow is created for your ap
 - https://github.com/ServiceNow/sncicd-tests-run
 - https://github.com/ServiceNow/sncicd-plugin-activate
 - https://github.com/ServiceNow/sncicd-plugin-rollback
+- https://github.com/ServiceNow/sncicd-batch-install
+- https://github.com/ServiceNow/sncicd-instance-scan
 
 ## Support Model
 

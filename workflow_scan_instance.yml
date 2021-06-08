@@ -1,0 +1,50 @@
+# This is a basic workflow to help you get started with Actions
+name: ServiceNow_Scan_Instance
+# Controls when the action will run.
+on:
+    # Triggers the workflow on push or pull request events but only for the master branch
+    push:
+        branches: [master]
+    pull_request:
+        branches: [master]
+    # Allows you to run this workflow manually from the Actions tab
+    workflow_dispatch:
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+    test:
+    # Purpose of this job is to Scan Instance. This should only 
+    # trigger if the feature branch has been merged to master after a successfully 
+    # completed pull request, hence the conditional for push to master.
+        name: Scan App
+        runs-on: ubuntu-latest
+    
+        steps:
+            - name: ServiceNow CI/CD Instance Scan
+              uses: ServiceNow/sncicd-instance-scan@1.0.0
+              id: scan
+              with:
+                # scantype is always Required
+                scantype: full # point, suite_combo, suite_scoped, suite_update
+                # Required on point
+                targetTable: abcdef
+                targetSysId: 1a2b3c4d5e6f
+                # Required on suite_combo
+                comboSysId: 1a2b3c4d5e6f
+                # Required on suite_scoped, suite_update
+                suiteSysId: 1a2b3c4d5e6f
+                # Required on suite_scoped
+                appScopeSysIds: 1a2b3c,4d5e6f
+                # Required on suite_update
+                updateSetSysIds: 1a2b3c,4d5e6f
+              env:
+                nowUsername: ${{ secrets.NOW_USERNAME }}
+                nowPassword: ${{ secrets.NOW_PASSWORD }}
+                nowScanInstance: ${{ secrets.NOW_SCAN_INSTANCE }}
+
+
+
+
+            
+
+    
+          

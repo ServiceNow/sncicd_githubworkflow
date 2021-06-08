@@ -1,0 +1,47 @@
+# This is a basic workflow to help you get started with Actions
+name: ServiceNow_Batch_Install
+# Controls when the action will run.
+on:
+    # Triggers the workflow on push or pull request events but only for the master branch
+    push:
+        branches: [master]
+    pull_request:
+        branches: [master]
+    # Allows you to run this workflow manually from the Actions tab
+    workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+    test:
+    # Purpose of this job is to Install App to a Prod instance. This should only 
+    # trigger if the feature branch has been merged to master after a successfully 
+    # completed pull request, hence the conditional for push to master.
+        name: Batch Install App
+        runs-on: ubuntu-latest
+        steps:
+            # This step is Required if you
+            # want to read manifest.json from your repo
+            - name: Checkout
+              uses: actions/checkout@v2
+            - name: ServiceNow CI/CD Batch Install App
+              uses: ServiceNow/sncicd-batch-install@1.0.0
+              id: batch_install
+              with:
+                  # Source of Data(file/workflow), Required
+                  source: file
+                  # Optional, manifest filename. Default: now_batch_manifest.json
+                  filename: manifest.json
+                  # Required if workflow source specified
+                  # Stringified json object
+                  manifest: '{"name": "Release Deployment","notes": "MyNotes","packages": [{"id": "123abc","type": "application","load_demo_data": false,"requested_version": "1.0.0","requested_customization_version": "1.0.1","notes": "MyNotes"}]}'
+              env:
+                  nowUsername: ${{ secrets.NOW_USERNAME }}
+                  nowPassword: ${{ secrets.NOW_PASSWORD }}
+                  nowInstallInstance: ${{ secrets.NOW_CLIENT_INSTANCE }}
+    
+
+
+            
+
+    
+          

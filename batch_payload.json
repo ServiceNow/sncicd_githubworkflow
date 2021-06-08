@@ -1,0 +1,22 @@
+{
+    "name": "Batch name here",
+    "notes": "Your notes here",
+    "packages": [
+        {
+            "id": "{{sys_id}}",
+            "type": "application",
+            "load_demo_data": false,
+            "requested_version": "{{version}}",
+            "requested_customization_version": "{{version}}",
+            "notes": "{{notes}}"
+        },
+        {
+            "id": "{{sys_id}}",
+            "type": "application",
+            "load_demo_data": false,
+            "requested_version": "{{version}}",
+            "requested_customization_version": "{{version}}",
+            "notes": "{{notes}}"
+        }
+    ]
+}

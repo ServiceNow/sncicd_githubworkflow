@@ -24,9 +24,9 @@ jobs:
       - name: ServiceNow CI/CD Apply Changes
         uses: ServiceNow/sncicd-apply-changes@1.0.0
         env:
-          snowUsername: ${{ secrets.SN_USERNAME }}
-          snowPassword: ${{ secrets.SN_PASSWORD }}
-          snowSourceInstance: ${{ secrets.SN_DEV_INSTANCE }}
+          nowUsername: ${{ secrets.SN_USERNAME }}
+          nowPassword: ${{ secrets.SN_PASSWORD }}
+          nowSourceInstance: ${{ secrets.SN_DEV_INSTANCE }}
           appSysID: ${{ secrets.SN_APP_SYSID }}
 
       - uses: actions/checkout@v2
@@ -37,10 +37,12 @@ jobs:
         with:
           # versionTemplate: 1.2
           versionFormat: detect
+          # Optional, add +X to version number. Default: 1 
+          # incrementBy: X
         env:
-          snowUsername: ${{ secrets.SN_USERNAME }}
-          snowPassword: ${{ secrets.SN_PASSWORD }}
-          snowSourceInstance: ${{ secrets.SN_DEV_INSTANCE }}
+          nowUsername: ${{ secrets.SN_USERNAME }}
+          nowPassword: ${{ secrets.SN_PASSWORD }}
+          nowSourceInstance: ${{ secrets.SN_DEV_INSTANCE }}
           appSysID: ${{ secrets.SN_APP_SYSID }}
           
     # This is required to pass the version number output from Publish App 
