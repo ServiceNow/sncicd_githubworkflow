@@ -1,1 +1,59 @@
+name: ServiceNow GitHub Actions Demo
 
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  publish:
+    # Purpose of this job is to demonstrate publishing an Application Customization 
+    name: Publish from Dev
+    runs-on: ubuntu-latest
+    steps:
+      - name: ServiceNow CI/CD Publish App
+        id: publish_app
+        uses: ServiceNow/sncicd-publish-app@2.0.1
+        with:
+          versionTemplate: 1.1
+          versionFormat: template
+          incrementBy: 1
+          isAppCustomization: true
+        env:
+          nowUsername: ${{ secrets.SN_USERNAME }}
+          nowPassword: ${{ secrets.SN_PASSWORD }}
+          nowSourceInstance: ${{ secrets.SN_DEV_INSTANCE }}
+          appSysID: ${{ secrets.SN_APP_SYSID }}
+          
+    # This is required to pass the version number output from Publish App 
+    # to the input for Install App in the next job! This is because the jobs 
+    # run on different Linux instances, so without this Install App won't know
+    # what to install.
+    outputs:
+      publishversion: ${{ steps.publish_app.outputs.newVersion }}
+
+  install:
+    # Purpose of this job is to demonstrate installing an Application Customization
+    needs: publish
+    name: Deploy to Prod
+    runs-on: ubuntu-latest
+    steps:
+    
+      - name: ServiceNow CI/CD Install App
+        id: install_app_prod
+        uses: ServiceNow/sncicd-install-app@1.0.0
+        with:
+          version: ${{ needs.publish.outputs.publishversion }}
+          # Only applicable if Application Customization is active. 
+          # Version of the base application on which to apply the customizations
+          baseAppVersion: '1.2.3'
+          # Only applicable if Application Customization is active and the associated 
+          # application is a higher version than the currently installed version
+          # Default: false
+          autoUpgradeBaseApp: true
+        env:
+          nowUsername: ${{ secrets.SN_USERNAME }}
+          nowPassword: ${{ secrets.SN_PASSWORD }}
+          nowInstallInstance: ${{ secrets.SN_PROD_INSTANCE }}
+          appSysID: ${{ secrets.SN_APP_SYSID }}
