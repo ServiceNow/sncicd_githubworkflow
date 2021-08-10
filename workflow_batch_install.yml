@@ -24,7 +24,7 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v2
             - name: ServiceNow CI/CD Batch Install App
-              uses: ServiceNow/sncicd-batch-install@1.0.0
+              uses: ServiceNow/sncicd-batch-install@2.0.1
               id: batch_install
               with:
                   # Source of Data(file/workflow), Required
