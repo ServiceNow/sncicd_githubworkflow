@@ -19,7 +19,7 @@ jobs:
     steps:
 
       - name: ServiceNow CI/CD Apply Changes
-        uses: ServiceNow/sncicd-apply-changes@1.0.0
+        uses: ServiceNow/sncicd-apply-changes@2.0.0
         env:
           nowUsername: ${{ secrets.SN_USERNAME }}
           nowPassword: ${{ secrets.SN_PASSWORD }}
@@ -28,7 +28,7 @@ jobs:
 
       - name: ServiceNow CI/CD Publish App
         id: publish_app
-        uses: ServiceNow/sncicd-publish-app@1.0.0
+        uses: ServiceNow/sncicd-publish-app@2.0.1
         with:
           versionTemplate: 1.1
           versionFormat: template
@@ -62,16 +62,16 @@ jobs:
 
       - name: ServiceNow CI/CD Install App
         id: install_app
-        uses: ServiceNow/sncicd-install-app@1.0.0
+        uses: ServiceNow/sncicd-install-app@2.0.0
         with:
           version: ${{ needs.build.outputs.publishversion }}
           # Only applicable if Application Customization is active. 
           # Version of the base application on which to apply the customizations
-          baseAppVersion: '1.2.3'
+#          baseAppVersion: '1.2.3'
           # Only applicable if Application Customization is active and the associated 
           # application is a higher version than the currently installed version
           # Default: false
-          autoUpgradeBaseApp: true
+          autoUpgradeBaseApp: false
         env:
           nowUsername: ${{ secrets.SN_USERNAME }}
           nowPassword: ${{ secrets.SN_PASSWORD }}
@@ -79,7 +79,7 @@ jobs:
           appSysID: ${{ secrets.SN_APP_SYSID }}
 
       - name: ServiceNow CI/CD Run ATF Test Suite
-        uses: ServiceNow/sncicd-tests-run@1.0.0
+        uses: ServiceNow/sncicd-tests-run@2.0.0
         with:
           testSuiteSysId: ${{ secrets.SN_ATFTESTSUITE_SYSID }}
         env:
@@ -89,7 +89,7 @@ jobs:
 
       - name: ServiceNow CI/CD Rollback App
         if: ${{ failure() && steps.install_app.outputs.rollbackVersion }}
-        uses: ServiceNow/sncicd-rollback-app@1.0.0
+        uses: ServiceNow/sncicd-rollback-app@2.0.0
         with:
           version: ${{steps.install_app.outputs.rollbackVersion}}
         env:
@@ -118,16 +118,16 @@ jobs:
     
       - name: ServiceNow CI/CD Install App
         id: install_app_prod
-        uses: ServiceNow/sncicd-install-app@1.0.0
+        uses: ServiceNow/sncicd-install-app@2.0.0
         with:
           version: ${{ needs.test.outputs.publishversion }}
           # Only applicable if Application Customization is active. 
           # Version of the base application on which to apply the customizations
-          baseAppVersion: '1.2.3'
+#          baseAppVersion: '1.2.3'
           # Only applicable if Application Customization is active and the associated 
           # application is a higher version than the currently installed version
           # Default: false
-          autoUpgradeBaseApp: true
+#          autoUpgradeBaseApp: true
         env:
           nowUsername: ${{ secrets.SN_USERNAME }}
           nowPassword: ${{ secrets.SN_PASSWORD }}
