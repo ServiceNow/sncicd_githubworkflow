@@ -20,7 +20,7 @@ jobs:
     
         steps:
             - name: ServiceNow CI/CD Instance Scan
-              uses: ServiceNow/sncicd-instance-scan@1.0.0
+              uses: ServiceNow/sncicd-instance-scan@2.0.0
               id: scan
               with:
                 # scantype is always Required
