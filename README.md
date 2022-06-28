@@ -4,6 +4,8 @@ These are the workflow files for helping people get started with GitHub Actions 
 
 Just copy and paste into your pipeline once your workflow is created for your application's linked GitHub repo. 
 
+The APIs the GitHub Actions are based on are [documented on the ServiceNow Developer Portal](https://developer.servicenow.com/dev.do#!/reference/api/sandiego/rest/cicd-api). 
+
 ## Description of workflow templates
 - [workflow.yml](https://github.com/ServiceNow/sncicd_githubworkflow/blob/master/workflow.yml) Standard example to start from with 3 stages - build, test, deploy to prod. First two runs for CI on feature branch PR. All 3 run for CD on master branch update. 
 - [workflow_publish_with_detect.yml](https://github.com/ServiceNow/sncicd_githubworkflow/blob/master/workflow_publish_with_detect.yml) Example for how to use the "detect" option with the ServiceNow/sncicd-publish-app GitHub Action. This is necessary for the repo source to be populated into the runner environment. 
