@@ -21,8 +21,8 @@ The APIs the GitHub Actions are based on are [documented on the ServiceNow Devel
 - https://github.com/marketplace/actions/servicenow-ci-cd-run-atf-test-suite
 - https://github.com/marketplace/actions/servicenow-ci-cd-activate-plugin
 - https://github.com/marketplace/actions/servicenow-ci-cd-rollback-plugin
-- <Add Batch Install Action After Publication>
-- <Add Scan Instance Action After Publication>
+- https://github.com/marketplace/actions/servicenow-ci-cd-batch-install
+- https://github.com/marketplace/actions/servicenow-ci-cd-instance-scan
 
 ## Repos
 - https://github.com/ServiceNow/sncicd-apply-changes
